@@ -1,9 +1,14 @@
 <?php include './koneksi/header.php'; ?>
 
+<!-- Tambahkan link CSS AOS di header.php -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
 <div class="container-fluid p-0">
     <!-- Hero Section -->
-    <section class="hero d-flex align-items-center justify-content-center text-center" style="background-image: url('./images/hero.jpg'); background-size: cover; height: 80vh; background-position: center;">
-        <div class="overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+    <section class="hero d-flex align-items-center justify-content-center text-center" 
+        style="background-image: url('./images/hero.jpg'); background-size: cover; height: 80vh; background-position: center;">
+        <div class="overlay d-flex flex-column align-items-center justify-content-center text-center p-4" 
+            data-aos="fade-up" data-aos-duration="1500">
             <h1 class="text-white display-4 fw-bold mb-3">Selamat datang di ResepNusantara</h1>
             <p class="text-white fs-5 mb-4">Temukan beragam resep masakan khas Indonesia yang lezat dan mudah diikuti</p>
         </div>
@@ -11,10 +16,10 @@
 
     <!-- Kategori Resep -->
     <section id="categories" class="py-5 bg-light">
-        <h2 class="text-center mb-4">Kategori Resep</h2>
+        <h2 class="text-center mb-4" data-aos="fade-down" data-aos-duration="1500">Kategori Resep</h2>
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="zoom-in" data-aos-duration="1000">
                     <div class="card shadow-sm border-0 rounded">
                         <img src="./images/kategori1.jpg" class="card-img-top" alt="Makanan Utama">
                         <div class="card-body text-center">
@@ -24,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="200">
                     <div class="card shadow-sm border-0 rounded">
                         <img src="./images/kategori2.jpg" class="card-img-top" alt="Makanan Penutup">
                         <div class="card-body text-center">
@@ -34,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="400">
                     <div class="card shadow-sm border-0 rounded">
                         <img src="./images/kategori3.jpg" class="card-img-top" alt="Makanan Ringan">
                         <div class="card-body text-center">
@@ -50,7 +55,7 @@
 
     <!-- Resep Populer -->
     <section id="popular-recipes" class="py-5">
-        <h2 class="text-center mb-4">Resep Populer</h2>
+        <h2 class="text-center mb-4" data-aos="fade-down" data-aos-duration="1500">Resep</h2>
         <div class="container">
             <div class="row">
                 <?php
@@ -64,7 +69,7 @@
                 // Menampilkan resep
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        echo '<div class="col-md-3">';
+                        echo '<div class="col-md-3" data-aos="flip-left" data-aos-duration="1200">';
                         echo '<div class="card shadow-sm border-0 rounded">';
                         echo '<img src="' . $row['image'] . '" class="card-img-top" alt="' . $row['name'] . '">';
                         echo '<div class="card-body">';
@@ -85,3 +90,9 @@
     <!-- Footer -->
     <?php include './koneksi/footer.php'; ?>
 </div>
+
+<!-- Tambahkan link JS AOS di footer.php -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>

@@ -2,9 +2,6 @@
 session_start();
 include './koneksi/db.php';
 
-// Cek role admin
-// Handle CREATE
-
 // Logika Hapus Resep
 if (isset($_GET['delete_id'])) {
     $id = intval($_GET['delete_id']); // Pastikan ID adalah integer
@@ -82,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // Fetch all recipes
 $result = $conn->query("SELECT * FROM recipes");
 ?>
-
 
 <!DOCTYPE html>
 <html lang="id">
@@ -253,50 +249,40 @@ $result = $conn->query("SELECT * FROM recipes");
 
         <!-- Tabel Resep -->
         <div class="card">
-    <div class="card-header">
-        <h4>Daftar Resep</h4>
-    </div>
-    <div class="card-body">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama Resep</th>
-                    <th>Deskripsi</th>
-                    <th>Gambar</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($row = $result->fetch_assoc()) { ?>
-                <tr>
-                    <td><?php echo $row['id']; ?></td>
-                    <td><?php echo $row['name']; ?></td>
-                    <td><?php echo substr($row['description'], 0, 50); ?>...</td>
-                    <td>
-                        <?php if ($row['image']) { ?>
-                            <img src="<?php echo $row['image']; ?>" alt="Gambar Resep" style="width: 100px; height: 100px;">
-                        <?php } else { ?>
-                            <span>-</span>
+            <div class="card-header">
+                <h4>Daftar Resep</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama Resep</th>
+                            <th>Deskripsi</th>
+                            <th>Gambar</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $result->fetch_assoc()) { ?>
+                        <tr>
+                            <td><?php echo $row['id']; ?></td>
+                            <td><?php echo $row['name']; ?></td>
+                            <td><?php echo substr($row['description'], 0, 50); ?>...</td>
+                            <td>
+                                <?php if ($row['image']) { ?>
+                                    <img src="<?php echo $row['image']; ?>" alt="Gambar Resep">
+                                <?php } ?>
+                            </td>
+                            <td>
+                                <a href="index.php?page=edit_recipe&id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="index.php?page=manage_recipes&delete_id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus resep ini?')">Hapus</a>                            </td>
+                        </tr>
                         <?php } ?>
-                    </td>
-                    <td>
-                        <a href="index.php?page=manage_recipes&delete_id=<?php echo $row['id']; ?>" 
-                           class="btn btn-danger btn-sm" 
-                           onclick="return confirm('Hapus resep ini?')">Hapus</a>
-                    </td>
-                </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-    </div>
-    </br>
-    <!-- Tombol Kembali -->
-    <button onclick="window.history.back();" class="btn btn-secondary mb-4" style="padding: 5px 15px; font-size: 0.875rem;">Kembali</button>
-
-
-    <?php include './koneksi/footer.php'; ?>
 </body>
 </html>

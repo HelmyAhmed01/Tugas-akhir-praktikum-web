@@ -14,12 +14,12 @@ if (isset($_GET['delete_id'])) {
     $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    header("Location: index.php?page=manage_users");    
+    header("Location: index.php?page=manage_users");
     exit();
 }
 
 // Handle CREATE
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['create_user'])) {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
@@ -31,8 +31,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit();
 }
 
+// Handle UPDATE (username or password)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_user'])) {
+    $id = $_POST['user_id'];
+    
+    // Update username if it's changed
+    if (!empty($_POST['username'])) {
+        $username = $_POST['username'];
+        $stmt = $conn->prepare("UPDATE users SET username = ? WHERE id = ?");
+        $stmt->bind_param("si", $username, $id);
+        $stmt->execute();
+    }
+    
+    // Update password if it's changed
+    if (!empty($_POST['password'])) {
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $stmt->bind_param("si", $password, $id);
+        $stmt->execute();
+    }
+    
+    header("Location: index.php?page=manage_users");
+    exit();
+}
+
 // Fetch all users
 $result = $conn->query("SELECT * FROM users");
+
+// Fetch specific user for update
+$user_to_edit = null;
+if (isset($_GET['edit_id'])) {
+    $edit_id = $_GET['edit_id'];
+    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->bind_param("i", $edit_id);
+    $stmt->execute();
+    $user_result = $stmt->get_result();
+    $user_to_edit = $user_result->fetch_assoc();
+}
 ?>
 
 <!DOCTYPE html>
@@ -41,8 +76,6 @@ $result = $conn->query("SELECT * FROM users");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Pengguna</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <!-- CSS tambahan langsung di sini -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,18 +86,24 @@ $result = $conn->query("SELECT * FROM users");
 
         main {
             margin: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         h2 {
             font-size: 2rem;
             color: #333;
             margin-bottom: 20px;
+            text-align: center;
         }
 
         h4 {
             font-size: 1.5rem;
             color: #555;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         form {
@@ -75,6 +114,8 @@ $result = $conn->query("SELECT * FROM users");
             margin-bottom: 30px;
             width: 100%;
             max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         form input, form select, form button {
@@ -122,6 +163,7 @@ $result = $conn->query("SELECT * FROM users");
         table td a:hover {
             text-decoration: underline;
         }
+
         .btn-back {
             background-color: #007bff;
             color: white;
@@ -131,11 +173,16 @@ $result = $conn->query("SELECT * FROM users");
             border-radius: 5px;
             cursor: pointer;
             margin-bottom: 20px;
+            display: block;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .btn-back:hover {
             background-color: #0056b3;
         }
+
         @media (max-width: 768px) {
             form {
                 width: 100%;
@@ -151,20 +198,36 @@ $result = $conn->query("SELECT * FROM users");
 <body>
 <?php include './koneksi/header.php'; ?>
 <main>
-    
     <h2>Kelola Pengguna</h2>
 
-    <!-- Form Tambah User -->
-    <h4>Tambah Pengguna</h4>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <select name="role">
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-        </select>
-        <button type="submit">Tambah</button>
-    </form>
+    <!-- Form Edit Username -->
+    <?php if ($user_to_edit): ?>
+        <h4>Edit Username</h4>
+        <form method="POST">
+            <input type="hidden" name="user_id" value="<?php echo $user_to_edit['id']; ?>">
+            <input type="text" name="username" value="<?php echo $user_to_edit['username']; ?>" placeholder="Username" required>
+            <button type="submit" name="update_user">Perbarui Username</button>
+        </form>
+        
+        <!-- Form Edit Password -->
+        <h4>Edit Password</h4>
+        <form method="POST">
+            <input type="hidden" name="user_id" value="<?php echo $user_to_edit['id']; ?>">
+            <input type="password" name="password" placeholder="Password Baru" required>
+            <button type="submit" name="update_user">Perbarui Password</button>
+        </form>
+    <?php else: ?>
+        <h4>Tambah Pengguna</h4>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <select name="role">
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+            </select>
+            <button type="submit" name="create_user">Tambah</button>
+        </form>
+    <?php endif; ?>
 
     <!-- Tabel User -->
     <h4>Daftar Pengguna</h4>
@@ -181,12 +244,14 @@ $result = $conn->query("SELECT * FROM users");
             <td><?php echo $row['username']; ?></td>
             <td><?php echo $row['role']; ?></td>
             <td>
+                <a href="index.php?page=manage_users&edit_id=<?php echo $row['id']; ?>">Edit</a> |
                 <a href="index.php?page=manage_users&delete_id=<?php echo $row['id']; ?>" onclick="return confirm('Hapus pengguna ini?')">Hapus</a>
             </td>
         </tr>
         <?php } ?>
     </table>
-        </br>
+
+    <br>
     <button class="btn-back" onclick="window.history.back();">Kembali</button>
 </main>
 <?php include './koneksi/footer.php'; ?>

@@ -2,7 +2,26 @@
 session_start();
 include './koneksi/auth.php';
 
-if (isset($_SESSION['user_id'])) {
+// Durasi timeout dalam detik (5 menit)
+$timeout_duration = 10; 
+
+// Periksa apakah sesi pengguna ada
+if (isset($_SESSION['user_id'])) {  
+    // Periksa apakah waktu terakhir interaksi disimpan
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+        // Jika waktu terakhir interaksi lebih dari durasi timeout, sesi dihapus
+        session_unset();
+        session_destroy();
+        setcookie('user_id', '', time() - 3600, "/");
+        setcookie('role', '', time() - 3600, "/");
+        setcookie('username', '', time() - 3600, "/");
+        header('Location: login.php?timeout=1'); // Redirect ke login dengan pesan timeout
+        exit;
+    }
+    // Perbarui waktu terakhir aktivitas
+    $_SESSION['last_activity'] = time();
+
+    // Redirect sesuai role pengguna
     if ($_SESSION['role'] === 'admin') {
         header('Location: index.php?page=admin');
         exit;
@@ -19,19 +38,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Pastikan tidak ada input kosong
     if (empty($username) || empty($password)) {
         $error = "Username atau password tidak boleh kosong.";
     } else {
-        // Cek jika yang login adalah admin menggunakan username dan password default
         if ($username === 'admin' && $password === 'admin123') {
             $_SESSION['user_id'] = 1;  // ID admin
             $_SESSION['role'] = 'admin';
+            $_SESSION['last_activity'] = time(); // Set waktu aktivitas terakhir
+            setcookie('user_id', 1, time() + $timeout_duration, "/");
+            setcookie('role', 'admin', time() + $timeout_duration, "/");
+            setcookie('username', 'admin', time() + $timeout_duration, "/");
+
             header('Location: index.php?page=admin');
             exit;
         }
 
-        // Jika bukan admin, cari pengguna biasa di database
         $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -41,7 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['role'] = $user['role'];
-            $_SESSION['username'] = $user['username'];  // Menyimpan username pengguna
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['last_activity'] = time(); // Set waktu aktivitas terakhir
+            setcookie('user_id', $user['id'], time() + $timeout_duration, "/");
+            setcookie('role', $user['role'], time() + $timeout_duration, "/");
+            setcookie('username', $user['username'], time() + $timeout_duration, "/");
+
             header('Location: index.php?page=user');
             exit;
         } else {
@@ -65,7 +91,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <section class="login-container">
             <div class="login-card">
                 <h1>Login</h1>
-                <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+                <?php 
+                if (isset($_GET['timeout'])) {
+                    echo "<p class='error'>Sesi Anda telah habis. Silakan login kembali.</p>";
+                }
+                if (isset($error)) echo "<p class='error'>$error</p>"; 
+                ?>
                 <form method="post">
                     <div class="form-group">
                         <label for="username">Username:</label>

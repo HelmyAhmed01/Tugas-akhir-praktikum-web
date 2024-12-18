@@ -21,10 +21,20 @@ if (isset($_GET['page'])) {
             include './tampilan/logout.php';
             break;
         case 'manage_users':
-        include './tampilan/manage_users.php';
+            include './tampilan/manage_users.php';
             break;
         case 'manage_recipes':
             include './tampilan/manage_recipes.php';
+            break;
+        case 'edit_recipe':
+            // Pastikan ada parameter 'id' di URL
+            if (isset($_GET['id'])) {
+                include './tampilan/edit_recipe.php'; // Path sesuai dengan file edit resep Anda
+            } else {
+                // Jika id tidak ditemukan, redirect ke halaman lain atau tampilkan pesan error
+                echo "Resep tidak ditemukan!";
+                exit();
+            }
             break;
         default:
             include './tampilan/404.php';
