@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 include './koneksi/db.php';
 
 // Cek apakah pengguna sudah login dan memiliki role admin
@@ -22,70 +22,28 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
-        /* Mengatur lebar sidebar */
-        nav.bg-dark {
-            width: 250px;
+        /* Reset */
+        body, html, ul, li, h2, p {
+            margin: 0;
+            padding: 0;
         }
 
-        /* Menyesuaikan konten utama */
-        main.p-4 {
-            padding-left: 20px;
-            padding-right: 20px;
+        body {
+            font-family: Arial, sans-serif;
         }
 
-        /* Membuat teks dalam card lebih besar */
-        .card-body .card-title {
-            font-size: 1.5rem;
-            font-weight: bold;
+        a {
+            text-decoration: none;
+            color: inherit;
         }
 
-        .card-body .card-text {
-            font-size: 1.25rem;
-        }
-
-        /* Membuat tombol logout lebih besar */
-        .btn-danger {
-            font-size: 1.1rem;
-            padding: 10px;
-        }
-
-        /* Menambah jarak antar item menu */
-        .nav-item.mb-2 {
-            margin-bottom: 15px;
-        }
-
-        /* Mengatur header pada card */
-        .card-header {
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-
-        /* Menambah margin bawah pada judul halaman */
-        h2.mb-4 {
-            margin-bottom: 30px;
-        }
-
-        /* Menyesuaikan ukuran teks pada statistik */
-        .card-text.fs-3 {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
-        /* Menambah padding pada header */
+        /* Header */
         header {
             background-color: #343a40;
             color: white;
             padding: 20px;
-            margin-bottom: 30px;
             text-align: center;
-        }
-
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         header h1 {
@@ -93,95 +51,168 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
             margin: 0;
         }
 
-        header .user-info {
-            font-size: 1.1rem;
+        /* Layout */
+        .d-flex {
+            display: flex;
+        }
+
+        /* Sidebar */
+        nav {
+            background-color: #343a40;
+            color: white;
+            width: 250px;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        nav h4 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-item {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .nav-item a {
+            color: white;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: #495057;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin-top: 30px;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        main h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        /* Card Styles */
+        .card-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+            max-width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .card.bg-success {
+            background-color: #28a745;
+        }
+
+        .card.bg-info {
+            background-color: #17a2b8;
+        }
+
+        .card h5 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 1.5rem;
             font-weight: bold;
         }
 
-        /* Responsif Header */
+        /* Responsif */
         @media (max-width: 768px) {
-            header .container {
+            nav {
+                width: 200px;
+            }
+
+            .card-container {
                 flex-direction: column;
-                text-align: center;
+                gap: 10px;
             }
 
-            header h1 {
-                margin-bottom: 10px;
+            .card {
+                max-width: 100%;
             }
-        }
-
-        /* Menambahkan jarak setelah header dan sidebar */
-        .container-fluid {
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <?php include './koneksi/header.php'; ?>
+    <header>
+        <h1>Dashboard Admin</h1>
+    </header>
 
     <div class="d-flex">
         <!-- Sidebar -->
-        <nav class="bg-dark text-white p-3 vh-100">
-            <h4 class="text-center mb-4">Menu Admin</h4>
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2">
-                    <a href="index.php?page=admin" class="nav-link text-white">Dashboard</a>
+        <nav>
+            <h4>Menu Admin</h4>
+            <ul>
+                <li class="nav-item">
+                    <a href="index.php?page=admin">Dashboard</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="index.php?page=manage_users" class="nav-link text-white">Kelola Pengguna</a>
+                <li class="nav-item">
+                    <a href="index.php?page=manage_users">Kelola Pengguna</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="index.php?page=manage_recipes" class="nav-link text-white">Kelola Konten</a>
+                <li class="nav-item">
+                    <a href="index.php?page=manage_recipes">Kelola Konten</a>
                 </li>
-                <li class="nav-item mt-3">
-                    <a href="index.php?page=logout" class="btn btn-danger w-100">Logout</a>
+                <li class="nav-item">
+                    <a href="index.php?page=logout" class="btn-danger">Logout</a>
                 </li>
             </ul>
         </nav>
 
         <!-- Main Content -->
-        <main class="p-4 flex-grow-1">
-            <h2 class="mb-4">Dashboard Admin</h2>
+        <main>
+            <h2>Dashboard Admin</h2>
             <p>Selamat datang, <strong><?php echo $username; ?></strong>!</p>
 
             <!-- Statistik -->
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card text-white bg-primary mb-3">
-                        <div class="card-header">Statistik</div>
-                        <div class="card-body">
-                            <h5 class="card-title">Total Pengguna</h5>
-                            <p class="card-text fs-3"><?php echo $totalUsers; ?></p>
-                        </div>
-                    </div>
+            <div class="card-container">
+                <div class="card">
+                    <h5>Total Pengguna</h5>
+                    <p><?php echo $totalUsers; ?></p>
                 </div>
-                <div class="col-md-4">
-                    <div class="card text-white bg-success mb-3">
-                        <div class="card-header">Konten</div>
-                        <div class="card-body">
-                            <h5 class="card-title">Konten Tersedia</h5>
-                            <p class="card-text fs-3">12</p> <!-- Contoh data -->
-                        </div>
-                    </div>
+                <div class="card bg-success">
+                    <h5>Konten Tersedia</h5>
+                    <p>12</p>
                 </div>
-                <div class="col-md-4">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-header">Aktivitas</div>
-                        <div class="card-body">
-                            <h5 class="card-title">Aktivitas Terkini</h5>
-                            <p class="card-text fs-5">Sistem berjalan lancar</p>
-                        </div>
-                    </div>
+                <div class="card bg-info">
+                    <h5>Aktivitas Terkini</h5>
+                    <p>Sistem berjalan lancar</p>
                 </div>
             </div>
         </main>
     </div>
-
-    <!-- Footer -->
-    <?php include './koneksi/footer.php'; ?>
-
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

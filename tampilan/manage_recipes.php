@@ -90,78 +90,88 @@ $result = $conn->query("SELECT * FROM recipes");
         /* Global Styles */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f4f6f9;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
         }
 
-        /* Container untuk menambahkan margin dan padding yang sesuai */
+        /* Container for general padding */
         .container {
-            margin-top: 30px;
-            margin-bottom: 50px;
+            margin-top: 40px;
+            margin-bottom: 60px;
+            padding: 20px;
         }
 
         /* Header Card */
         .card-header {
-            background-color: #007bff;
+            background-color: #17a2b8;
             color: white;
-            font-size: 1.25rem;
+            font-size: 1.6rem;
             font-weight: bold;
             text-align: center;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
         }
 
         /* Card Body */
         .card-body {
             background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            padding: 20px;
-            border-radius: 8px;
+            border: 1px solid #e3e3e3;
+            border-radius: 0 0 8px 8px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         /* Form styling */
         .form-label {
             font-weight: bold;
-            color: #343a40;
+            color: #495057;
         }
 
         /* Input dan Textarea styling */
         input[type="text"], textarea, input[type="file"], .form-control {
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ced4da;
             width: 100%;
+            font-size: 1.1rem;
         }
 
         input[type="text"]:focus, textarea:focus, input[type="file"]:focus {
-            border-color: #007bff;
+            border-color: #17a2b8;
             outline: none;
         }
 
         /* Button Styling */
         button[type="submit"] {
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 22px;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             width: 100%;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button[type="submit"]:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
 
-        /* Tabel styling */
+        /* Table styling */
         .table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .table th, .table td {
             text-align: center;
-            padding: 12px;
+            padding: 15px;
             border: 1px solid #dee2e6;
+            font-size: 1.1rem;
         }
 
         .table th {
@@ -181,19 +191,33 @@ $result = $conn->query("SELECT * FROM recipes");
         }
 
         /* Tabel tombol aksi */
+        .btn-danger, .btn-warning {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
         .btn-danger {
             background-color: #dc3545;
             color: white;
-            padding: 6px 12px;
-            border-radius: 5px;
-            text-decoration: none;
         }
 
         .btn-danger:hover {
             background-color: #c82333;
         }
 
-        /* Responsif untuk ukuran kecil */
+        .btn-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        /* Responsive styling for small screens */
         @media (max-width: 768px) {
             .container {
                 margin-top: 20px;
@@ -204,7 +228,7 @@ $result = $conn->query("SELECT * FROM recipes");
             }
 
             .card-header {
-                font-size: 1.1rem;
+                font-size: 1.4rem;
             }
 
             button[type="submit"] {
@@ -212,9 +236,15 @@ $result = $conn->query("SELECT * FROM recipes");
             }
 
             .table th, .table td {
-                font-size: 0.9rem;
+                font-size: 1rem;
+            }
+
+            .table img {
+                width: 90px;
+                height: 90px;
             }
         }
+
     </style>
 </head>
 <body>
@@ -258,31 +288,30 @@ $result = $conn->query("SELECT * FROM recipes");
                         <tr>
                             <th>ID</th>
                             <th>Nama Resep</th>
-                            <th>Deskripsi</th>
                             <th>Gambar</th>
+                            <th>Deskripsi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = $result->fetch_assoc()) { ?>
-                        <tr>
-                            <td><?php echo $row['id']; ?></td>
-                            <td><?php echo $row['name']; ?></td>
-                            <td><?php echo substr($row['description'], 0, 50); ?>...</td>
-                            <td>
-                                <?php if ($row['image']) { ?>
-                                    <img src="<?php echo $row['image']; ?>" alt="Gambar Resep">
-                                <?php } ?>
-                            </td>
-                            <td>
-                                <a href="index.php?page=edit_recipe&id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="index.php?page=manage_recipes&delete_id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus resep ini?')">Hapus</a>                            </td>
-                        </tr>
-                        <?php } ?>
+                        <?php while ($row = $result->fetch_assoc()) : ?>
+                            <tr>
+                                <td><?php echo $row['id']; ?></td>
+                                <td><?php echo $row['name']; ?></td>
+                                <td><img src="<?php echo $row['image']; ?>" alt="gambar resep"></td>
+                                <td><?php echo substr($row['description'], 0, 100) . '...'; ?></td>
+                                <td>
+                                    <a href="index.php?page=manage_recipes&delete_id=<?php echo $row['id']; ?>" class="btn btn-danger">Hapus</a>
+                                    <a href="index.php?page=edit_recipe&id=<?php echo $row['id']; ?>" class="btn btn-warning">Edit</a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <?php include './koneksi/footer.php'; ?>
 </body>
 </html>

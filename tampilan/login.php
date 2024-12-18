@@ -2,14 +2,14 @@
 session_start();
 include './koneksi/auth.php';
 
-// Durasi timeout dalam detik (5 menit)
+// Durasi timeout dalam detik (10 detik untuk keperluan pengujian)
 $timeout_duration = 10; 
 
-// Periksa apakah sesi pengguna ada
+// Cek apakah sesi sudah ada
 if (isset($_SESSION['user_id'])) {  
     // Periksa apakah waktu terakhir interaksi disimpan
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
-        // Jika waktu terakhir interaksi lebih dari durasi timeout, sesi dihapus
+        // Jika sesi sudah timeout, hapus sesi dan cookie
         session_unset();
         session_destroy();
         setcookie('user_id', '', time() - 3600, "/");
@@ -18,6 +18,35 @@ if (isset($_SESSION['user_id'])) {
         header('Location: login.php?timeout=1'); // Redirect ke login dengan pesan timeout
         exit;
     }
+    // Perbarui waktu terakhir aktivitas
+    $_SESSION['last_activity'] = time();
+
+    // Redirect sesuai role pengguna
+    if ($_SESSION['role'] === 'admin') {
+        header('Location: index.php?page=admin');
+        exit;
+    } else {
+        header('Location: index.php?page=user');
+        exit;
+    }
+} elseif (isset($_COOKIE['user_id']) && isset($_COOKIE['role']) && isset($_COOKIE['username'])) {
+    // Jika cookie ada, set sesi berdasarkan cookie
+    $_SESSION['user_id'] = $_COOKIE['user_id'];
+    $_SESSION['role'] = $_COOKIE['role'];
+    $_SESSION['username'] = $_COOKIE['username'];
+
+    // Periksa waktu aktivitas terakhir dari sesi
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+        // Jika sesi sudah timeout, hapus sesi dan cookie
+        session_unset();
+        session_destroy();
+        setcookie('user_id', '', time() - 3600, "/");
+        setcookie('role', '', time() - 3600, "/");
+        setcookie('username', '', time() - 3600, "/");
+        header('Location: login.php?timeout=1'); // Redirect ke login dengan pesan timeout
+        exit;
+    }
+
     // Perbarui waktu terakhir aktivitas
     $_SESSION['last_activity'] = time();
 

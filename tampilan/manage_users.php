@@ -32,10 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['create_user'])) {
 }
 
 // Handle UPDATE (username or password)
+// Handle UPDATE (username dan/atau password)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_user'])) {
     $id = $_POST['user_id'];
     
-    // Update username if it's changed
+    // Update username jika ada input
     if (!empty($_POST['username'])) {
         $username = $_POST['username'];
         $stmt = $conn->prepare("UPDATE users SET username = ? WHERE id = ?");
@@ -43,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_user'])) {
         $stmt->execute();
     }
     
-    // Update password if it's changed
+    // Update password jika ada input
     if (!empty($_POST['password'])) {
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_user'])) {
     header("Location: index.php?page=manage_users");
     exit();
 }
+
 
 // Fetch all users
 $result = $conn->query("SELECT * FROM users");
@@ -202,32 +204,25 @@ if (isset($_GET['edit_id'])) {
 
     <!-- Form Edit Username -->
     <?php if ($user_to_edit): ?>
-        <h4>Edit Username</h4>
-        <form method="POST">
-            <input type="hidden" name="user_id" value="<?php echo $user_to_edit['id']; ?>">
-            <input type="text" name="username" value="<?php echo $user_to_edit['username']; ?>" placeholder="Username" required>
-            <button type="submit" name="update_user">Perbarui Username</button>
-        </form>
-        
-        <!-- Form Edit Password -->
-        <h4>Edit Password</h4>
-        <form method="POST">
-            <input type="hidden" name="user_id" value="<?php echo $user_to_edit['id']; ?>">
-            <input type="password" name="password" placeholder="Password Baru" required>
-            <button type="submit" name="update_user">Perbarui Password</button>
-        </form>
-    <?php else: ?>
-        <h4>Tambah Pengguna</h4>
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <select name="role">
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-            </select>
-            <button type="submit" name="create_user">Tambah</button>
-        </form>
-    <?php endif; ?>
+    <h4>Edit Pengguna</h4>
+    <form method="POST">
+        <input type="hidden" name="user_id" value="<?php echo $user_to_edit['id']; ?>">
+        <input type="text" name="username" value="<?php echo $user_to_edit['username']; ?>" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password Baru (Kosongkan jika tidak ingin mengganti)">
+        <button type="submit" name="update_user">Perbarui</button>
+    </form>
+<?php else: ?>
+    <h4>Tambah Pengguna</h4>
+    <form method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <select name="role">
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+        </select>
+        <button type="submit" name="create_user">Tambah</button>
+    </form>
+<?php endif; ?>
 
     <!-- Tabel User -->
     <h4>Daftar Pengguna</h4>
